@@ -13,6 +13,10 @@ public class StylesUtils {
     public static final String TEXTO_SIMPLES_STYLE = "font-size: 10pt; text-align: justify; text-indent: 2rem;";
     public static final String ORDEM_PREAMBULO_STYLE = "font-size: 12pt; font-weight: bold; text-indent: 2rem;";
 
+    public static final String TAB_CENTRO_8 = "font-size: 8pt; text-align: center;";
+    public static final String TAB_JUSTIFICA_8 = "font-size: 8pt; text-align: justify;";
+    public static final String TAB_DIREITA_8 = "font-size: 8pt; text-align: justify;";
+
     public static String getEstiloFromId(String idEstilo){
         if(Objects.nonNull(idEstilo)){
             if(idEstilo.contains("epigrafe")){
@@ -29,6 +33,12 @@ public class StylesUtils {
                 return ORDEM_PREAMBULO_STYLE;
             } else if(idEstilo.contains("texto")){
                 return TEXTO_SIMPLES_STYLE;
+            } else if(idEstilo.contains("tabdireita8")){
+                return TAB_DIREITA_8;
+            } else if(idEstilo.contains("tabjustifica8")){
+                return TAB_JUSTIFICA_8;
+            } else if(idEstilo.contains("tabcentro8")){
+                return TAB_CENTRO_8;
             } else {
                 return "";
             }

@@ -40,11 +40,9 @@ public class DocToHtmlService {
     }
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
-        Element htmlParagraph = new Element(Tag.valueOf("p"), "");
+        Element htmlParagraph = new Element(Tag.valueOf("p"), "")
+                .attr("style", StylesUtils.getEstiloFromId(paragraph.getStyle()));
 
-        htmlParagraph.attr("style", StylesUtils.getEstiloFromId(paragraph.getStyle()));
-
-        // Iterar sobre os runs para adicionar texto e hyperlinks
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
                 htmlParagraph.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
@@ -74,8 +72,10 @@ public class DocToHtmlService {
                 Element htmlCell = new Element(Tag.valueOf("td"), "");
                 htmlCell.text(cell.getText());
 
+
                 // Verificar hyperlinks nas células e adicionar ao conteúdo
                 for (XWPFParagraph paragraph : cell.getParagraphs()) {
+                    htmlCell.attr("style", StylesUtils.getEstiloFromId(paragraph.getStyle()));
                     for (XWPFRun run : paragraph.getRuns()) {
                         if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
                             htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
