@@ -1,5 +1,6 @@
 package com.carlosdev.doctohtml.converter;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +17,7 @@ public class DocToHtmlController {
         this.docToHtmlService = docToHtmlService;
     }
 
-    @PostMapping("/convert")
+    @PostMapping(value = "/convert", produces = MediaType.TEXT_HTML_VALUE)
     public String convertDocToHtml(@RequestParam("file") MultipartFile file) {
         return docToHtmlService.convertDoc(file);
     }

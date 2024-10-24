@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static com.carlosdev.doctohtml.converter.StylesUtils.CONTAINER_STYLE;
+
 @Service
 public class DocToHtmlService {
 
@@ -21,44 +23,46 @@ public class DocToHtmlService {
 
     private String convertDocxToHtml(MultipartFile file) throws IOException {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
-            StringBuilder htmlBuilder = new StringBuilder();
+            Element htmlDiv = new Element(Tag.valueOf("div"), "");
+            htmlDiv.attr("style", CONTAINER_STYLE);
 
             // Processar todos os elementos na ordem em que aparecem no documento
             for (IBodyElement element : document.getBodyElements()) {
                 if (element instanceof XWPFParagraph paragraph) {
-                    htmlBuilder.append(generateHtmlFromParagraph(paragraph));
+                    htmlDiv.appendChild(generateHtmlFromParagraph(paragraph));
                 } else if (element instanceof XWPFTable table) {
-                    htmlBuilder.append(generateHtmlFromTable(table));
+                    htmlDiv.appendChild(generateHtmlFromTable(table));
                 }
             }
 
-            return htmlBuilder.toString();
+            return htmlDiv.outerHtml();
         }
     }
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
-        boolean isHeading = paragraph.getStyle() != null && paragraph.getStyle().equals("Heading1");
-        String tagName = isHeading ? "h1" : "p";
-        Element htmlParagraph = new Element(Tag.valueOf(tagName), "");
+        Element htmlParagraph = new Element(Tag.valueOf("p"), "");
 
-        System.out.println("Estilo -> ["+paragraph.getStyleID() +"] ----> " + paragraph.getText() + "|| " + paragraph.getNumFmt());
-        htmlParagraph.attr("style", StylesUtils.getSpigrafeStyle());
-        htmlParagraph.attr("class", paragraph.getStyle());
+        htmlParagraph.attr("style", StylesUtils.getEstiloFromId(paragraph.getStyle()));
 
         // Iterar sobre os runs para adicionar texto e hyperlinks
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
                 htmlParagraph.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
             } else {
-                String text = run.text();
-                htmlParagraph.appendText(text);
+                if(run.isBold()) {
+                    Element bElement = new Element(Tag.valueOf("b"), "");
+                    bElement.text(run.text());
+                    htmlParagraph.appendChild(bElement);
+                }else{
+                    htmlParagraph.appendText(run.text());
+                }
             }
         }
 
         return htmlParagraph;
     }
 
-    private String generateHtmlFromTable(XWPFTable table) {
+    private Element generateHtmlFromTable(XWPFTable table) {
         Element htmlTable = new Element(Tag.valueOf("table"), "");
         htmlTable.attr("border", "1");
 
@@ -83,7 +87,7 @@ public class DocToHtmlService {
 
             htmlTable.appendChild(htmlRow);
         }
-        return htmlTable.outerHtml();
+        return htmlTable;
     }
 
     private Element generateHyperlinkFromParagraph(XWPFHyperlinkRun hyperlinkRun) {
