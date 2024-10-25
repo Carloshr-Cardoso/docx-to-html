@@ -19,7 +19,7 @@ public class DocToHtmlController {
 
     @PostMapping(value = "/convert", produces = MediaType.TEXT_HTML_VALUE)
     public String convertDocToHtml(@RequestParam("file") MultipartFile file) {
-        return docToHtmlService.convertDoc(file);
+        return docToHtmlService.convertDocxToHtml(file);
     }
 
 

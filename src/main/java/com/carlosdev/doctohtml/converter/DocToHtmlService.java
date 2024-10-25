@@ -14,15 +14,7 @@ import static java.util.Objects.isNull;
 @Service
 public class DocToHtmlService {
 
-    public String convertDoc(MultipartFile file) {
-        try {
-            return convertDocxToHtml(file);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    private String convertDocxToHtml(MultipartFile file) throws IOException {
+    public String convertDocxToHtml(MultipartFile file) {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
             StringBuilder htmlBuilder = new StringBuilder();
 
@@ -45,6 +37,8 @@ public class DocToHtmlService {
 
             htmlBuilder.append(htmlDiv);
             return htmlBuilder.toString();
+        } catch (IOException e) {
+            return null;
         }
     }
 
