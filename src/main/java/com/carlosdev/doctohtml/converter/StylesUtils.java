@@ -12,6 +12,7 @@ public class StylesUtils {
     public static final String EMENTA_STYLE = "font-size: 10pt; text-align: justify; width: 50%; margin-left: auto; margin-right: 0;";
     public static final String NOVA_REDACAO_STYLE = "font-size: 10pt; text-align: justify; text-indent: 4rem;";
     public static final String TEXTO_SIMPLES_STYLE = "font-size: 10pt; text-align: justify; text-indent: 2rem;";
+    public static final String CARGO_STYLE = "font-size: 9pt; text-align: justify; text-indent: 2rem;";
     public static final String ORDEM_PREAMBULO_STYLE = "font-size: 12pt; font-weight: bold; text-indent: 2rem;";
 
     public static final String TAB_CENTRO_8 = "font-size: 8pt; text-align: center;";
@@ -42,6 +43,10 @@ public class StylesUtils {
             return "tabcentro8";
         } else if (idEstilo.contains("TableParagraph")) {
             return "TableParagraph";
+        } else if (idEstilo.contains("autoridade")) {
+            return "autoridade";
+        } else if (idEstilo.contains("cargo")) {
+            return "cargo";
         }
         return null;
 
@@ -58,7 +63,9 @@ public class StylesUtils {
                 ".tabdireita8 {" + TAB_DIREITA_8 + "}" +
                 ".tabjustifica8 {" + TAB_JUSTIFICA_8 + "}" +
                 ".tabcentro8 {" + TAB_CENTRO_8 + "}" +
-                ".TableParagraph {" + TAB_CENTRO_8 + "}";
+                ".TableParagraph {" + TAB_CENTRO_8 + "}" +
+                ".autoridade {" + TEXTO_SIMPLES_STYLE + "}" +
+                ".cargo {" + CARGO_STYLE + "}";
 
     }
 }
