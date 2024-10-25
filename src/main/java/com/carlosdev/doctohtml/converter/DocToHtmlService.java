@@ -8,24 +8,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.carlosdev.doctohtml.converter.StylesUtils.ATTR_STYLE;
-import static com.carlosdev.doctohtml.converter.StylesUtils.CONTAINER_STYLE;
+import static com.carlosdev.doctohtml.converter.StylesUtils.*;
+import static java.util.Objects.isNull;
 
 @Service
 public class DocToHtmlService {
 
-    public String convertDoc(MultipartFile file) {
-        try {
-            return convertDocxToHtml(file);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    private String convertDocxToHtml(MultipartFile file) throws IOException {
+    public String convertDocxToHtml(MultipartFile file) {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
+            StringBuilder htmlBuilder = new StringBuilder();
+
+            Element styleTag = new Element(Tag.valueOf("style"), "");
+            styleTag.append(addCssStylesToHtml());
+
+            htmlBuilder.append(styleTag);
+
             Element htmlDiv = new Element(Tag.valueOf("div"), "");
-            htmlDiv.attr(ATTR_STYLE, CONTAINER_STYLE);
+            htmlDiv.attr(ATTR_CLASS, "container");
 
             // Processar todos os elementos na ordem em que aparecem no documento
             for (IBodyElement element : document.getBodyElements()) {
@@ -36,13 +35,19 @@ public class DocToHtmlService {
                 }
             }
 
-            return htmlDiv.outerHtml();
+            htmlBuilder.append(htmlDiv);
+            return htmlBuilder.toString();
+        } catch (IOException e) {
+            return null;
         }
     }
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
-        Element htmlParagraph = new Element(Tag.valueOf("p"), "")
-                .attr(ATTR_STYLE, StylesUtils.getEstiloFromId(paragraph.getStyle()));
+        Element htmlParagraph = new Element(Tag.valueOf("p"), "");
+
+        var classe = getClassFromId(paragraph.getStyle());
+        if (!isNull(classe))
+            htmlParagraph.attr(ATTR_CLASS, classe);
 
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
@@ -73,22 +78,27 @@ public class DocToHtmlService {
                 Element htmlCell = new Element(Tag.valueOf("td"), "");
                 htmlCell.text(cell.getText());
 
-
-                // Verificar hyperlinks nas células e adicionar ao conteúdo
-                for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                    htmlCell.attr(ATTR_STYLE, StylesUtils.getEstiloFromId(paragraph.getStyle()));
-                    for (XWPFRun run : paragraph.getRuns()) {
-                        if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
-                            htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
-                        }
-                    }
-                }
+                checkHyperlinkFromTable(cell, htmlCell);
                 htmlRow.appendChild(htmlCell);
             }
 
             htmlTable.appendChild(htmlRow);
         }
         return htmlTable;
+    }
+
+    private void checkHyperlinkFromTable(XWPFTableCell cell, Element htmlCell){
+        for (XWPFParagraph paragraph : cell.getParagraphs()) {
+            var classe = getClassFromId(paragraph.getStyle());
+            if (!isNull(classe))
+                htmlCell.attr(ATTR_CLASS, classe);
+
+            for (XWPFRun run : paragraph.getRuns()) {
+                if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
+                    htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
+                }
+            }
+        }
     }
 
     private Element generateHyperlinkFromParagraph(XWPFHyperlinkRun hyperlinkRun) {
@@ -101,8 +111,5 @@ public class DocToHtmlService {
 
         return linkElement;
     }
-
-
-
 
 }
