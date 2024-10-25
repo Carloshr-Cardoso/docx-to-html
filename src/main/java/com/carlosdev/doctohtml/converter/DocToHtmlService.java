@@ -8,8 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.carlosdev.doctohtml.converter.StylesUtils.ATTR_STYLE;
-import static com.carlosdev.doctohtml.converter.StylesUtils.CONTAINER_STYLE;
+import static com.carlosdev.doctohtml.converter.StylesUtils.*;
 
 @Service
 public class DocToHtmlService {
@@ -24,8 +23,15 @@ public class DocToHtmlService {
 
     private String convertDocxToHtml(MultipartFile file) throws IOException {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
+            StringBuilder htmlBuilder = new StringBuilder();
+
+            Element styleTag = new Element(Tag.valueOf("style"), "");
+            styleTag.append(addCssStylesToHtml());
+
+            htmlBuilder.append(styleTag);
+
             Element htmlDiv = new Element(Tag.valueOf("div"), "");
-            htmlDiv.attr(ATTR_STYLE, CONTAINER_STYLE);
+            htmlDiv.attr(ATTR_CLASS, "container");
 
             // Processar todos os elementos na ordem em que aparecem no documento
             for (IBodyElement element : document.getBodyElements()) {
@@ -36,13 +42,14 @@ public class DocToHtmlService {
                 }
             }
 
-            return htmlDiv.outerHtml();
+            htmlBuilder.append(htmlDiv);
+            return htmlBuilder.toString();
         }
     }
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
         Element htmlParagraph = new Element(Tag.valueOf("p"), "")
-                .attr(ATTR_STYLE, StylesUtils.getEstiloFromId(paragraph.getStyle()));
+                .attr(ATTR_CLASS, getClassFromId(paragraph.getStyle()));
 
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
@@ -76,7 +83,7 @@ public class DocToHtmlService {
 
                 // Verificar hyperlinks nas células e adicionar ao conteúdo
                 for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                    htmlCell.attr(ATTR_STYLE, StylesUtils.getEstiloFromId(paragraph.getStyle()));
+                    htmlCell.attr(ATTR_CLASS, getClassFromId(paragraph.getStyle()));
                     for (XWPFRun run : paragraph.getRuns()) {
                         if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
                             htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
@@ -101,6 +108,7 @@ public class DocToHtmlService {
 
         return linkElement;
     }
+
 
 
 
