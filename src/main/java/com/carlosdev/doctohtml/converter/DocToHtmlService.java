@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 import static com.carlosdev.doctohtml.converter.StylesUtils.*;
+import static java.util.Objects.isNull;
 
 @Service
 public class DocToHtmlService {
@@ -48,8 +49,11 @@ public class DocToHtmlService {
     }
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
-        Element htmlParagraph = new Element(Tag.valueOf("p"), "")
-                .attr(ATTR_CLASS, getClassFromId(paragraph.getStyle()));
+        Element htmlParagraph = new Element(Tag.valueOf("p"), "");
+
+        var classe = getClassFromId(paragraph.getStyle());
+        if (!isNull(classe))
+            htmlParagraph.attr(ATTR_CLASS, classe);
 
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
@@ -80,22 +84,27 @@ public class DocToHtmlService {
                 Element htmlCell = new Element(Tag.valueOf("td"), "");
                 htmlCell.text(cell.getText());
 
-
-                // Verificar hyperlinks nas células e adicionar ao conteúdo
-                for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                    htmlCell.attr(ATTR_CLASS, getClassFromId(paragraph.getStyle()));
-                    for (XWPFRun run : paragraph.getRuns()) {
-                        if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
-                            htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
-                        }
-                    }
-                }
+                checkHyperlinkFromTable(cell, htmlCell);
                 htmlRow.appendChild(htmlCell);
             }
 
             htmlTable.appendChild(htmlRow);
         }
         return htmlTable;
+    }
+
+    private void checkHyperlinkFromTable(XWPFTableCell cell, Element htmlCell){
+        for (XWPFParagraph paragraph : cell.getParagraphs()) {
+            var classe = getClassFromId(paragraph.getStyle());
+            if (!isNull(classe))
+                htmlCell.attr(ATTR_CLASS, classe);
+
+            for (XWPFRun run : paragraph.getRuns()) {
+                if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
+                    htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));
+                }
+            }
+        }
     }
 
     private Element generateHyperlinkFromParagraph(XWPFHyperlinkRun hyperlinkRun) {
@@ -108,9 +117,5 @@ public class DocToHtmlService {
 
         return linkElement;
     }
-
-
-
-
 
 }
