@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static com.carlosdev.doctohtml.converter.StylesUtils.ATTR_STYLE;
 import static com.carlosdev.doctohtml.converter.StylesUtils.CONTAINER_STYLE;
 
 @Service
@@ -24,7 +25,7 @@ public class DocToHtmlService {
     private String convertDocxToHtml(MultipartFile file) throws IOException {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
             Element htmlDiv = new Element(Tag.valueOf("div"), "");
-            htmlDiv.attr("style", CONTAINER_STYLE);
+            htmlDiv.attr(ATTR_STYLE, CONTAINER_STYLE);
 
             // Processar todos os elementos na ordem em que aparecem no documento
             for (IBodyElement element : document.getBodyElements()) {
@@ -41,7 +42,7 @@ public class DocToHtmlService {
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
         Element htmlParagraph = new Element(Tag.valueOf("p"), "")
-                .attr("style", StylesUtils.getEstiloFromId(paragraph.getStyle()));
+                .attr(ATTR_STYLE, StylesUtils.getEstiloFromId(paragraph.getStyle()));
 
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
@@ -75,7 +76,7 @@ public class DocToHtmlService {
 
                 // Verificar hyperlinks nas células e adicionar ao conteúdo
                 for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                    htmlCell.attr("style", StylesUtils.getEstiloFromId(paragraph.getStyle()));
+                    htmlCell.attr(ATTR_STYLE, StylesUtils.getEstiloFromId(paragraph.getStyle()));
                     for (XWPFRun run : paragraph.getRuns()) {
                         if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
                             htmlCell.appendChild(generateHyperlinkFromParagraph(hyperlinkRun));

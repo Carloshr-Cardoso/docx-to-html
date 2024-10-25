@@ -5,6 +5,7 @@ import java.util.Objects;
 public class StylesUtils {
     private StylesUtils() {}
 
+    public static final String ATTR_STYLE = "style";
     public static final String CONTAINER_STYLE = "width: 70%; margin: 0 auto; font-family:'arial';";
     public static final String EPIGRAFE_STYLE = "font-size: 13pt; font-weight: bold; text-align: center";
     public static final String DATA_PUBLICACAO_STYLE = "font-size: 8pt; display: list-item; list-style-position: inside;";
