@@ -1,6 +1,6 @@
 package com.carlosdev.doctohtml.converter;
 
-import org.springframework.lang.NonNull;
+import java.util.Objects;
 
 public class StylesUtils {
     private StylesUtils() {}
@@ -20,33 +20,35 @@ public class StylesUtils {
     public static final String TAB_DIREITA_8 = "font-size: 8pt; text-align: justify;";
 
 
-    public static String getClassFromId(@NonNull String idEstilo) {
-        if (idEstilo.contains("epigrafe")) {
-            return "epigrafe";
-        } else if (idEstilo.contains("publicacao")) {
-            return "publicacao";
-        } else if (idEstilo.contains("ementa")) {
-            return "ementa";
-        } else if (idEstilo.contains("novaredacao")) {
-            return "novaredacao";
-        } else if (idEstilo.contains("preambulo")) {
-            return "preambulo";
-        } else if (idEstilo.contains("ordempreamb")) {
-            return "ordempreamb";
-        } else if (idEstilo.contains("texto")) {
-            return "texto";
-        } else if (idEstilo.contains("tabdireita8")) {
-            return "tabdireita8";
-        } else if (idEstilo.contains("tabjustifica8")) {
-            return "tabjustifica8";
-        } else if (idEstilo.contains("tabcentro8")) {
-            return "tabcentro8";
-        } else if (idEstilo.contains("TableParagraph")) {
-            return "TableParagraph";
-        } else if (idEstilo.contains("autoridade")) {
-            return "autoridade";
-        } else if (idEstilo.contains("cargo")) {
-            return "cargo";
+    public static String getClassFromId(String idEstilo) {
+        if(!Objects.isNull(idEstilo)){
+            if (idEstilo.contains("epigrafe")) {
+                return "epigrafe";
+            } else if (idEstilo.contains("publicacao")) {
+                return "publicacao";
+            } else if (idEstilo.contains("ementa")) {
+                return "ementa";
+            } else if (idEstilo.contains("novaredacao")) {
+                return "novaredacao";
+            } else if (idEstilo.contains("preambulo")) {
+                return "preambulo";
+            } else if (idEstilo.contains("ordempreamb")) {
+                return "ordempreamb";
+            } else if (idEstilo.contains("texto")) {
+                return "texto";
+            } else if (idEstilo.contains("tabdireita8")) {
+                return "tabdireita8";
+            } else if (idEstilo.contains("tabjustifica8")) {
+                return "tabjustifica8";
+            } else if (idEstilo.contains("tabcentro8")) {
+                return "tabcentro8";
+            } else if (idEstilo.contains("TableParagraph")) {
+                return "TableParagraph";
+            } else if (idEstilo.contains("autoridade")) {
+                return "autoridade";
+            } else if (idEstilo.contains("cargo")) {
+                return "cargo";
+            }
         }
         return null;
 
