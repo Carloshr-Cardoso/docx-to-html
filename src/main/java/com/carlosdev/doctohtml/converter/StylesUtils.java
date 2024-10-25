@@ -1,8 +1,6 @@
 package com.carlosdev.doctohtml.converter;
 
-import org.springframework.lang.NonNull;
-
-import java.util.Map;
+import java.util.Objects;
 
 public class StylesUtils {
     private StylesUtils() {}
@@ -20,25 +18,36 @@ public class StylesUtils {
     public static final String TAB_JUSTIFICA_8 = "font-size: 8pt; text-align: justify;";
     public static final String TAB_DIREITA_8 = "font-size: 8pt; text-align: justify;";
 
-    private static final Map<String, String> ESTILOS = Map.of(
-            "epigrafe", "epigrafe",
-            "publicacao", "publicacao",
-            "ementa", "ementa",
-            "novaredacao", "novaredacao",
-            "preambulo", "preambulo",
-            "ordempreamb", "ordempreamb",
-            "texto", "texto",
-            "tabdireita8", "tabdireita8",
-            "tabjustifica8", "tabjustifica8",
-            "tabcentro8", "tabcentro8"
-    );
 
-    public static String getClassFromId(@NonNull String idEstilo){
-        return ESTILOS.keySet().stream()
-                .filter(idEstilo::contains)
-                .findFirst()
-                .map(ESTILOS::get)
-                .orElse("");
+    public static String getClassFromId(String idEstilo) {
+        if (Objects.nonNull(idEstilo)) {
+            if (idEstilo.contains("epigrafe")) {
+                return "epigrafe";
+            } else if (idEstilo.contains("publicacao")) {
+                return "publicacao";
+            } else if (idEstilo.contains("ementa")) {
+                return "ementa";
+            } else if (idEstilo.contains("novaredacao")) {
+                return "novaredacao";
+            } else if (idEstilo.contains("preambulo")) {
+                return "preambulo";
+            } else if (idEstilo.contains("ordempreamb")) {
+                return "ordempreamb";
+            } else if (idEstilo.contains("texto")) {
+                return "texto";
+            } else if (idEstilo.contains("tabdireita8")) {
+                return "tabdireita8";
+            } else if (idEstilo.contains("tabjustifica8")) {
+                return "tabjustifica8";
+            } else if (idEstilo.contains("tabcentro8")) {
+                return "tabcentro8";
+            } else if (idEstilo.contains("TableParagraph")) {
+                return "TableParagraph";
+            } else {
+                return "";
+            }
+        }
+        return "";
     }
 
     public static String addCssStylesToHtml() {
@@ -51,7 +60,8 @@ public class StylesUtils {
                 ".texto {" + TEXTO_SIMPLES_STYLE + "}" +
                 ".tabdireita8 {" + TAB_DIREITA_8 + "}" +
                 ".tabjustifica8 {" + TAB_JUSTIFICA_8 + "}" +
-                ".tabcentro8 {" + TAB_CENTRO_8 + "}";
+                ".tabcentro8 {" + TAB_CENTRO_8 + "}" +
+                ".TableParagraph {" + TAB_CENTRO_8 + "}";
 
     }
 }
