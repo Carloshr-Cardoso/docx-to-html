@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: doctopdf
+
+app:
+  directory:
+    path: C:/Users/carlo/Documents/interna
