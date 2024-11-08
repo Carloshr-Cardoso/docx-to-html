@@ -42,6 +42,47 @@ public class DocToHtmlService {
         }
     }
 
+    public AtoLegislativoDTO extrairInformacoes(MultipartFile file){
+        AtoLegislativoDTO ato = new AtoLegislativoDTO();
+
+        try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
+            for (IBodyElement element : document.getBodyElements()) {
+                if (element instanceof XWPFParagraph paragraph) {
+                    preencheInformacoesFromParagraph(paragraph, ato);
+                }
+            }
+            return ato;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+
+    private void preencheInformacoesFromParagraph(XWPFParagraph paragraph, AtoLegislativoDTO ato) {
+
+        var idEstilo = paragraph.getStyle();
+        var textoParagrafo = paragraph.getText();
+
+        //System.out.println(textoParagrafo + "----> [%s]".formatted(idEstilo));
+
+        if(!isNull(idEstilo)){
+            if (idEstilo.contains("epigrafe")) {
+                ato.setEpigrafe(textoParagrafo);
+            } else if (idEstilo.contains("publicacao") && isNull(ato.getLocalPublicacao())) {
+                ato.setLocalPublicacao(textoParagrafo);
+            } else if (idEstilo.contains("ementa")) {
+                ato.setEmenta(textoParagrafo);
+            } else if (idEstilo.contains("preambulo")) {
+                ato.setPreambulo(textoParagrafo);
+            } else if (idEstilo.contains("ordempreamb")) {
+                ato.setResolve(textoParagrafo);
+            }
+        }
+    }
+
+
+
+
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
         Element htmlParagraph = new Element(Tag.valueOf("p"), "");
 
