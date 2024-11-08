@@ -1,18 +1,15 @@
 package com.carlosdev.doctohtml.converter;
 
+import java.time.LocalDate;
+
 public class AtoLegislativoDTO {
 
     private String epigrafe;
     private String ementa;
     private String localPublicacao;
-    private String preambulo;
-    private String considerandos;
-    private String resolve;
-    private String autoridade;
-    private String cargo;
-    private String observacao;
-
-
+    private LocalDate dataPublicacao;
+    private String categoria;
+    private String subcategoria;
 
     public String getEpigrafe() {
         return epigrafe;
@@ -38,51 +35,27 @@ public class AtoLegislativoDTO {
         this.localPublicacao = localPublicacao;
     }
 
-    public String getPreambulo() {
-        return preambulo;
+    public LocalDate getDataPublicacao() {
+        return dataPublicacao;
     }
 
-    public void setPreambulo(String preambulo) {
-        this.preambulo = preambulo;
+    public void setDataPublicacao(LocalDate dataPublicacao) {
+        this.dataPublicacao = dataPublicacao;
     }
 
-    public String getConsiderandos() {
-        return considerandos;
+    public String getCategoria() {
+        return categoria;
     }
 
-    public void setConsiderandos(String considerandos) {
-        this.considerandos = considerandos;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
-    public String getResolve() {
-        return resolve;
+    public String getSubcategoria() {
+        return subcategoria;
     }
 
-    public void setResolve(String resolve) {
-        this.resolve = resolve;
-    }
-
-    public String getAutoridade() {
-        return autoridade;
-    }
-
-    public void setAutoridade(String autoridade) {
-        this.autoridade = autoridade;
-    }
-
-    public String getCargo() {
-        return cargo;
-    }
-
-    public void setCargo(String cargo) {
-        this.cargo = cargo;
-    }
-
-    public String getObservacao() {
-        return observacao;
-    }
-
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
+    public void setSubcategoria(String subcategoria) {
+        this.subcategoria = subcategoria;
     }
 }

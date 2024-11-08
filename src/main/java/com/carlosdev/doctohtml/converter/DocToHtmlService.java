@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.carlosdev.doctohtml.converter.StylesUtils.*;
 import static java.util.Objects.isNull;
@@ -63,24 +67,39 @@ public class DocToHtmlService {
         var idEstilo = paragraph.getStyle();
         var textoParagrafo = paragraph.getText();
 
-        //System.out.println(textoParagrafo + "----> [%s]".formatted(idEstilo));
-
         if(!isNull(idEstilo)){
             if (idEstilo.contains("epigrafe")) {
                 ato.setEpigrafe(textoParagrafo);
             } else if (idEstilo.contains("publicacao") && isNull(ato.getLocalPublicacao())) {
-                ato.setLocalPublicacao(textoParagrafo);
+                extrairLocalEData(textoParagrafo, ato);
             } else if (idEstilo.contains("ementa")) {
                 ato.setEmenta(textoParagrafo);
-            } else if (idEstilo.contains("preambulo")) {
-                ato.setPreambulo(textoParagrafo);
-            } else if (idEstilo.contains("ordempreamb")) {
-                ato.setResolve(textoParagrafo);
             }
         }
     }
 
 
+    public static void extrairLocalEData(String texto, AtoLegislativoDTO ato) {
+        String regex = "(Publicad[ao]|Publica[çc][ãa]o) no (.+?) de (\\d{2})\\.(\\d{2})\\.(\\d{2,4})";
+        Pattern pattern = Pattern.compile(regex, Pattern.UNICODE_CASE);
+        Matcher matcher = pattern.matcher(texto);
+
+        if (matcher.find()) {
+            String localPublicacao = matcher.group(2).trim();
+
+            String dia = matcher.group(3);
+            String mes = matcher.group(4);
+            String ano = matcher.group(5);
+
+            if (ano.length() == 2) {
+                ano = "20" + ano; // Ajusta o ano para o formato completo
+            }
+            LocalDate dataPublicacao = LocalDate.parse(dia + "/" + mes + "/" + ano, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            ato.setDataPublicacao(dataPublicacao);
+            ato.setLocalPublicacao(localPublicacao);
+        }
+    }
 
 
     private Element generateHtmlFromParagraph(XWPFParagraph paragraph) {
