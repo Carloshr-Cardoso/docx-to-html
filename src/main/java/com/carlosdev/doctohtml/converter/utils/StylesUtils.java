@@ -1,4 +1,4 @@
-package com.carlosdev.doctohtml.converter;
+package com.carlosdev.doctohtml.converter.utils;
 
 import java.util.Objects;
 
