@@ -7,15 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.carlosdev.doctohtml.converter.utils.StylesUtils.addCssStylesToHtml;
-import static com.carlosdev.doctohtml.converter.utils.StylesUtils.getClassFromId;
+import static com.carlosdev.doctohtml.converter.utils.StylesUtils.*;
 
-public class ConvertDocxUtils {
-    private ConvertDocxUtils() {
-    }
+public class ConvertDocx {
+    private ConvertDocx() {}
 
 
-    public static String convertDocxToHtml(MultipartFile file) {
+    public static String toHtml(MultipartFile file) {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
             StringBuilder htmlBuilder = new StringBuilder();
 
@@ -25,7 +23,7 @@ public class ConvertDocxUtils {
             htmlBuilder.append(styleTag);
 
             Element htmlDiv = new Element(Tag.valueOf("div"), "");
-            htmlDiv.attr("class", "container");
+            htmlDiv.attr(ATTR_CLASS, "container");
 
             for (IBodyElement element : document.getBodyElements()) {
                 if (element instanceof XWPFParagraph paragraph) {
@@ -47,7 +45,7 @@ public class ConvertDocxUtils {
 
         var classe = getClassFromId(paragraph.getStyle());
         if (classe != null)
-            htmlParagraph.attr("class", classe);
+            htmlParagraph.attr(ATTR_CLASS, classe);
 
         for (XWPFRun run : paragraph.getRuns()) {
             if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
@@ -101,7 +99,7 @@ public class ConvertDocxUtils {
         for (XWPFParagraph paragraph : cell.getParagraphs()) {
             var classe = getClassFromId(paragraph.getStyle());
             if (classe != null)
-                htmlCell.attr("class", classe);
+                htmlCell.attr(ATTR_CLASS, classe);
 
             for (XWPFRun run : paragraph.getRuns()) {
                 if (run instanceof XWPFHyperlinkRun hyperlinkRun) {
