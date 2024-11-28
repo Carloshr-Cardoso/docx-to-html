@@ -18,8 +18,6 @@ public class ConvertDoc {
 
     public static String toHtml(MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
-            HWPFDocument document = new HWPFDocument(inputStream);
-            Range range = document.getRange();
             StringBuilder htmlContent = new StringBuilder();
             htmlContent
                     .append("<style type='text/css'>")
@@ -27,35 +25,43 @@ public class ConvertDoc {
                     .append("</style>")
                     .append("<div class='container'>");
 
-            // Process paragraphs and tables
-            TableIterator tableIterator = new TableIterator(range);
-
-            for (int i = 0; i < range.numParagraphs(); i++) {
-                Paragraph paragraph = range.getParagraph(i);
-
-                // Check if the current paragraph is part of a table
-                if (tableIterator.hasNext()) {
-                    Table table = tableIterator.next();
-                    htmlContent.append(convertTableToHtml(table));
-                    // Skip paragraphs that are part of the current table
-                    i += table.numParagraphs() - 1;
-                } else {
-
-                    StyleSheet style = document.getStyleSheet();
-                    String styleName = paragraph.getStyleIndex() != -1 ? style.getStyleDescription(paragraph.getStyleIndex()).getName() : "";
-
-                    htmlContent
-                            .append("<p class='").append(getClassFromId(styleName)).append("'>")
-                            .append(processHyperlinks(paragraph))
-                            .append("</p>");
-                }
-            }
+            processaCorpoDocumento(htmlContent, new HWPFDocument(inputStream));
 
             htmlContent.append("</div>");
-
             return htmlContent.toString();
         } catch (IOException e) {
             return null;
+        }
+    }
+
+    private static void processaCorpoDocumento(StringBuilder htmlContent, HWPFDocument document){
+        Range range = document.getRange();
+        TableIterator tableIterator = new TableIterator(range);
+
+        for (int i = 0; i < range.numParagraphs(); i++) {
+            Paragraph paragraph = range.getParagraph(i);
+            StyleSheet style = document.getStyleSheet();
+
+            // Verifica se o parágrafo é parte de uma tabela
+            if (tableIterator.hasNext() && paragraph.isInTable()) {
+                Table table = tableIterator.next();
+                String styleName = paragraph.getStyleIndex() != -1 ? style.getStyleDescription(paragraph.getStyleIndex()).getName() : "";
+
+                htmlContent.append(convertTableToHtml(table, getClassFromId(styleName)));
+                // Pula os parágrafos pertencentes à tabela
+                while (i < range.numParagraphs() && range.getParagraph(i).isInTable()) {
+                    i++;
+                }
+                i--;
+            } else {
+                String styleName = paragraph.getStyleIndex() != -1 ? style.getStyleDescription(paragraph.getStyleIndex()).getName() : "";
+
+                htmlContent
+                        .append("<p class='%s' >".formatted(getClassFromId(styleName)))
+                        .append(processHyperlinks(paragraph))
+                        .append("</p>");
+            }
+
         }
     }
 
@@ -66,10 +72,10 @@ public class ConvertDoc {
             if (paragraph.getCharacterRun(j).isBold()){
                 paragraphContent
                         .append("<b>")
-                        .append(paragraph.getCharacterRun(j).text())
+                        .append(paragraph.getCharacterRun(j).text().trim())
                         .append("</b>");
             } else {
-                paragraphContent.append(paragraph.getCharacterRun(j).text());
+                paragraphContent.append(paragraph.getCharacterRun(j).text().trim());
             }
         }
 
@@ -116,23 +122,28 @@ public class ConvertDoc {
         return output.toString();
     }
 
-    private static String convertTableToHtml(Table table) {
-        StringBuilder tableHtml = new StringBuilder("<table>");
+    private static String convertTableToHtml(Table table, String style) {
+        StringBuilder html = new StringBuilder("<table border='1' class='%s'>".formatted(style));
 
-        for (int rowIndex = 0; rowIndex < table.numRows(); rowIndex++) {
-            TableRow row = table.getRow(rowIndex);
-            tableHtml.append("<tr>");
+        for (int rowIdx = 0; rowIdx < table.numRows(); rowIdx++) {
+            TableRow row = table.getRow(rowIdx);
+            html.append("<tr>");
 
-            for (int colIndex = 0; colIndex < row.numCells(); colIndex++) {
-                tableHtml.append("<td>")
-                        .append(row.getCell(colIndex).text().trim())
-                        .append("</td>");
+            for (int colIdx = 0; colIdx < row.numCells(); colIdx++) {
+                TableCell cell = row.getCell(colIdx);
+                html.append("<td>");
+
+                for (int p = 0; p < cell.numParagraphs(); p++) {
+                    Paragraph cellParagraph = cell.getParagraph(p);
+                    html.append(processaParagrafos(cellParagraph));
+                }
+
+                html.append("</td>");
             }
-
-            tableHtml.append("</tr>");
+            html.append("</tr>");
         }
 
-        tableHtml.append("</table>");
-        return tableHtml.toString();
+        html.append("</table>");
+        return html.toString();
     }
 }
