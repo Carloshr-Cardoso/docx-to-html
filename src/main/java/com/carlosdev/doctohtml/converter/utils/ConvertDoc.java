@@ -45,9 +45,8 @@ public class ConvertDoc {
             // Verifica se o parágrafo é parte de uma tabela
             if (tableIterator.hasNext() && paragraph.isInTable()) {
                 Table table = tableIterator.next();
-                String styleName = paragraph.getStyleIndex() != -1 ? style.getStyleDescription(paragraph.getStyleIndex()).getName() : "";
 
-                htmlContent.append(convertTableToHtml(table, getClassFromId(styleName)));
+                htmlContent.append(processaTabela(table, style));
                 // Pula os parágrafos pertencentes à tabela
                 while (i < range.numParagraphs() && range.getParagraph(i).isInTable()) {
                     i++;
@@ -91,39 +90,29 @@ public class ConvertDoc {
         // Remove o símbolo ASCII 19 da string
         input = input.replace("\u0013", "");
 
-        // Expressão regular para encontrar hyperlinks no formato especificado
+        // Expressão regular para encontrar hyperlinks no formato maluco do documento
         String regex = "HYPERLINK \"(.*?)\".*?\u0014(.*?)\u0015";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
 
-        // StringBuilder para construir a saída formatada
         StringBuilder output = new StringBuilder();
-
-        // Índice de início para copiar texto não correspondente
         int lastEnd = 0;
-
-        // Itera sobre todas as correspondências encontradas
         while (matcher.find()) {
-            // Adiciona texto não correspondente antes do hyperlink
             output.append(input, lastEnd, matcher.start());
 
-            // Formata o hyperlink encontrado
             String url = matcher.group(1);
             String text = matcher.group(2);
             output.append("<a href=\"").append(url).append("\">").append(text).append("</a>");
 
-            // Atualiza o índice de fim da última correspondência
             lastEnd = matcher.end();
         }
-
-        // Adiciona qualquer texto restante após o último hyperlink
         output.append(input.substring(lastEnd));
 
         return output.toString();
     }
 
-    private static String convertTableToHtml(Table table, String style) {
-        StringBuilder html = new StringBuilder("<table border='1' class='%s'>".formatted(style));
+    private static String processaTabela(Table table, StyleSheet style) {
+        StringBuilder html = new StringBuilder("<table border='1'>");
 
         for (int rowIdx = 0; rowIdx < table.numRows(); rowIdx++) {
             TableRow row = table.getRow(rowIdx);
@@ -135,7 +124,9 @@ public class ConvertDoc {
 
                 for (int p = 0; p < cell.numParagraphs(); p++) {
                     Paragraph cellParagraph = cell.getParagraph(p);
-                    html.append(processaParagrafos(cellParagraph));
+
+                    String styleName = cellParagraph.getStyleIndex() != -1 ? style.getStyleDescription(cellParagraph.getStyleIndex()).getName() : "";
+                    html.append("<span class='%s'>%s</span>".formatted(getClassFromId(styleName), processaParagrafos(cellParagraph)));
                 }
 
                 html.append("</td>");
