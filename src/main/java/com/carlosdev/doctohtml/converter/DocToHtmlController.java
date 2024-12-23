@@ -1,6 +1,7 @@
 package com.carlosdev.doctohtml.converter;
 
 import com.carlosdev.doctohtml.converter.utils.ConvertDoc;
+import com.carlosdev.doctohtml.converter.utils.ExtractInfoUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,12 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocToHtmlController {
 
     private final DocToHtmlService docToHtmlService;
-    private final ExtractInfoService extractInfoService;
 
-    public DocToHtmlController(DocToHtmlService docToHtmlService,
-                               ExtractInfoService extractInfoService) {
+    public DocToHtmlController(DocToHtmlService docToHtmlService) {
         this.docToHtmlService = docToHtmlService;
-        this.extractInfoService = extractInfoService;
     }
 
     @PostMapping(value = "/convert", produces = MediaType.TEXT_HTML_VALUE)
@@ -29,7 +27,7 @@ public class DocToHtmlController {
 
     @PostMapping(value = "/info")
     public ResponseEntity<AtoLegislativoDTO> extractInfo(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(extractInfoService.extrairInformacoes(file));
+        return ResponseEntity.ok(ExtractInfoUtils.extrairInformacoes(file));
     }
 
     @PostMapping(value = "/convert-doc", produces = MediaType.TEXT_HTML_VALUE)

@@ -1,9 +1,9 @@
-package com.carlosdev.doctohtml.converter;
+package com.carlosdev.doctohtml.converter.utils;
 
+import com.carlosdev.doctohtml.converter.AtoLegislativoDTO;
 import org.apache.poi.xwpf.usermodel.IBodyElement;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,10 +14,11 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 
-@Service
-public class ExtractInfoService {
+public class ExtractInfoUtils {
+    private ExtractInfoUtils() {
+    }
 
-    public AtoLegislativoDTO extrairInformacoes(MultipartFile file){
+    public static AtoLegislativoDTO extrairInformacoes(MultipartFile file){
         AtoLegislativoDTO ato = new AtoLegislativoDTO();
 
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())) {
@@ -32,7 +33,7 @@ public class ExtractInfoService {
         }
     }
 
-    private void preencheInformacoesFromParagraph(XWPFParagraph paragraph, AtoLegislativoDTO ato) {
+    private static void preencheInformacoesFromParagraph(XWPFParagraph paragraph, AtoLegislativoDTO ato) {
 
         var idEstilo = paragraph.getStyle();
         var textoParagrafo = paragraph.getText();
