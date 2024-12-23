@@ -71,10 +71,10 @@ public class ConvertDoc {
             if (paragraph.getCharacterRun(j).isBold()){
                 paragraphContent
                         .append("<b>")
-                        .append(paragraph.getCharacterRun(j).text().trim())
+                        .append(paragraph.getCharacterRun(j).text())
                         .append("</b>");
             } else {
-                paragraphContent.append(paragraph.getCharacterRun(j).text().trim());
+                paragraphContent.append(paragraph.getCharacterRun(j).text());
             }
         }
 
